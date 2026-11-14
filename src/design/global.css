@@ -50,15 +50,3 @@ a {
   margin-inline: auto;
   padding-inline: var(--page-gutter);
 }
-
-@media (max-width: 900px) {
-  :root {
-    --page-gutter: 24px;
-  }
-}
-
-@media (max-width: 600px) {
-  :root {
-    --page-gutter: 12px;
-  }
-}

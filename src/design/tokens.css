@@ -33,8 +33,8 @@
   --shadow-soft: 0 4px 8px rgba(0, 0, 0, 0.1);
 
   /* Layout */
-  --page-gutter: 12%;
-  --container-max: 1600px;
+  --page-gutter: 20px;
+  --container-max: 1100px;
 
   /* Imagen de fondo */
   --bg-image: url('/assets/botanical-background.jpeg');

@@ -207,7 +207,7 @@
 /* SECCIÓN INFERIOR: Alineada con stretch para igualar alturas */
 .bottomSection {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
   width: 100%;
   align-items: stretch;
@@ -241,7 +241,7 @@
 
 .speciesRowStacked {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
   margin: auto 0;
   width: 100%;
@@ -254,23 +254,22 @@
   text-align: center;
   background: #f4f6f4;
   padding: 14px;
+  min-width: 0;
   border-radius: 10px;
   border: 1px solid #eaeaea;
 }
 
 .speciesCardStacked img {
-  width: 155px !important;
-  height: 155px !important;
-  min-width: 155px !important;
-  min-height: 155px !important;
-  max-width: 155px !important;
-  max-height: 155px !important;
-  border-radius: 50% !important;
-  object-fit: cover !important;
-  border: 3px solid #2c5e3b !important;
-  margin-bottom: 8px !important;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
-  display: block !important;
+  width: 100%;
+  max-width: 155px;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #2c5e3b;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  display: block;
 }
 
 .speciesInfoStacked {
@@ -290,6 +289,7 @@
   color: #2c5e3b;
   font-size: 15px;
   font-style: italic;
+  overflow-wrap: anywhere;
 }
 
 .caseContentClean {
