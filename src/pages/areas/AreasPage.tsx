@@ -6,7 +6,7 @@ import styles from './AreasPage.module.css'
 // Imágenes directamente en la carpeta assets
 import fondoFinal from '../../assets/fondofinal.jpeg'
 import botanicalBg from '../../assets/botanical-background.jpeg'
-import chicamochaImg from '../../assets/chicamocha.jpeg'
+import chicamochaImg from '../../assets/Chicamocha.jpeg'
 
 import fondo1 from '../../assets/fondo1.jpeg'
 import foto1 from '../../assets/foto1.jpg'

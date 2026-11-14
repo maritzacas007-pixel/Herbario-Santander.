@@ -14,7 +14,7 @@ import flora3 from '../../assets/especies/flora3.jpg'
 import flora4 from '../../assets/especies/flora4.jpg'
 
 // Imágenes de fauna representativa (Armadillo, Salamandra, Turpial, Lagarto de zona seca)
-import fauna1 from '../../assets/especies/fauna1.jpg'
+import fauna1 from '../../assets/especies/Fauna1.jpg'
 import fauna2 from '../../assets/especies/fauna2.jpg'
 import fauna3 from '../../assets/especies/fauna3.jpg'
 import fauna4 from '../../assets/especies/fauna4.jpg'
