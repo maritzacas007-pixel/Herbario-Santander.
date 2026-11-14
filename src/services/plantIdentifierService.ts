@@ -39,7 +39,36 @@ export interface IdentificationResult {
 }
 
 // Tu API Key configurada para producción y APK
-const PLANTNET_API_KEY = "2b10rYjWunDABKUeLGuG1v9q"; 
+const PLANTNET_API_KEY = "2b10rYjWunDABKUeLGuG1v9q";
+
+// Especies del herbario (registradas en el Distrito de Umpalá)
+const HERBARIUM_SPECIES = [
+  "ceiba pentandra", "cavanillesia chicamochae", "inga vera", "melocactus guanensis",
+  "zamia encephalartoides", "anacardium excelsum", "pithecellobium dulce",
+  "melocactus schatzlii", "cedrela odorata", "cascabela thevetia",
+  "salvia aratocensis", "melocactus pescaderensis",
+];
+
+function isHerbariumSpecies(name: string): boolean {
+  const n = name.toLowerCase();
+  return HERBARIUM_SPECIES.some((s) => n.startsWith(s));
+}
+
+interface GbifTaxonomy {
+  kingdom?: string; phylum?: string; class?: string; order?: string; family?: string; genus?: string;
+}
+
+// Completa la taxonomía (clase, orden...) que Pl@ntNet no devuelve
+async function fetchTaxonomy(name: string): Promise<GbifTaxonomy | null> {
+  try {
+    const res = await fetch(`https://api.gbif.org/v1/species/match?name=${encodeURIComponent(name)}`);
+    if (!res.ok) return null;
+    const d = await res.json();
+    return d.matchType === "NONE" ? null : d;
+  } catch {
+    return null;
+  }
+}
 
 export async function identifyPlantImage(
   imageFile: File,
@@ -103,9 +132,9 @@ export async function identifyPlantImage(
     // Petición real a la API oficial de Pl@ntNet
     const formData = new FormData();
     formData.append('images', imageFile);
-    
-    const organParam = filters?.organs || 'auto';
-    const url = `https://my-api.plantnet.org/v2/train/identify?api-key=${PLANTNET_API_KEY}&organs=${organParam}`;
+    formData.append('organs', filters?.organs || 'auto');
+
+    const url = `https://my-api.plantnet.org/v2/identify/all?api-key=${PLANTNET_API_KEY}&lang=es`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -124,40 +153,41 @@ export async function identifyPlantImage(
 
     const bestMatch = data.results[0];
     const speciesInfo = bestMatch.species;
+    const scientificName: string = speciesInfo.scientificNameWithoutAuthor || speciesInfo.scientificName;
+    const taxo = await fetchTaxonomy(scientificName);
+    const ND = "No disponible";
 
     const realMatch: PlantMatch = {
-      commonName: speciesInfo.commonNames && speciesInfo.commonNames.length > 0 
-        ? speciesInfo.commonNames[0] 
-        : (speciesInfo.scientificNameWithoutAuthor || speciesInfo.scientificName),
-      scientificName: speciesInfo.scientificNameWithoutAuthor || speciesInfo.scientificName,
+      commonName: speciesInfo.commonNames?.[0] || scientificName,
+      scientificName,
       confidence: Math.round(bestMatch.score * 100),
-      isRecordedInUmpala: true,
-      similarSpecies: data.results.slice(1, 4).map((r: any) => r.species.scientificName),
+      isRecordedInUmpala: isHerbariumSpecies(scientificName),
+      similarSpecies: data.results.slice(1, 4).map((r: any) => r.species.scientificNameWithoutAuthor || r.species.scientificName),
       taxonomy: {
-        reino: speciesInfo.family?.kingdom?.scientificName || "Plantae",
-        division: "Tracheophyta",
-        clase: "Magnoliopsida",
-        orden: "Malvales",
-        familia: speciesInfo.family?.scientificName || "No especificada",
-        genero: speciesInfo.genus?.scientificName || "No especificado",
+        reino: taxo?.kingdom || "Plantae",
+        division: taxo?.phylum || ND,
+        clase: taxo?.class || ND,
+        orden: taxo?.order || ND,
+        familia: speciesInfo.family?.scientificNameWithoutAuthor || speciesInfo.family?.scientificName || taxo?.family || ND,
+        genero: speciesInfo.genus?.scientificNameWithoutAuthor || speciesInfo.genus?.scientificName || taxo?.genus || ND,
         especie: speciesInfo.scientificName,
       },
       botanicalCharacteristics: {
-        tipoPlanta: "Registro obtenido mediante análisis de visión artificial en línea",
-        tipoRaiz: "Consulte la literatura regional de referencia",
-        tallo: "Estructura vegetal analizada por IA",
-        hojas: `Órgano analizado: ${filters?.organs || 'General'}`,
-        flor: "Verificar en campo según inflorescencia",
-        fruto: "Característico del género botánico",
-        habitat: "Ecosistemas neotropicales de Colombia",
-        ecosistema: filters?.ecosystem || "Bosque tropical / Andino",
-        distribucion: "Reportado en registros botánicos de Colombia",
-        importanciaEcologica: "Eje fundamental de la biodiversidad local y conectividad ecológica",
-        estadoConservacion: "Evaluar según listas rojas de la UICN y SiB Colombia",
+        tipoPlanta: ND,
+        tipoRaiz: ND,
+        tallo: ND,
+        hojas: ND,
+        flor: ND,
+        fruto: ND,
+        habitat: ND,
+        ecosistema: filters?.ecosystem || ND,
+        distribucion: ND,
+        importanciaEcologica: ND,
+        estadoConservacion: ND,
       },
       sources: [
         "Pl@ntNet API Recognition Engine",
-        "SiB Colombia - Sistema de Información sobre Biodiversidad de Colombia"
+        ...(taxo ? ["GBIF Backbone Taxonomy"] : []),
       ]
     };
 
