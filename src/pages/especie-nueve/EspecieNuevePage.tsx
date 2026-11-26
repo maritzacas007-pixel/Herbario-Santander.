@@ -3,7 +3,7 @@ import type { NavItem } from '../../shared/components'
 import styles from './EspecieNuevePage.module.css'
 
 // Imagen horizontal específica para la cabecera de detalle (especie 9)
-import plantaHorizontalEjemplo from '../../assets/especies/planta9A.jpg'
+import plantaHorizontalEjemplo from '../../assets/especies/planta9A-nueva.jpeg'
 
 // Imágenes específicas para cada característica de la especie 9
 import raizEjemplo from '../../assets/especies/planta9-raiz.jpg'
